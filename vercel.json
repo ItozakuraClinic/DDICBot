@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/tg-webhook",
+      "destination": "/api/tg-webhook"
+    }
+  ],
+  "crons": []
+}

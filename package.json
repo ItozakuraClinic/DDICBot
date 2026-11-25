@@ -1,0 +1,33 @@
+{
+  "name": "ddicbot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "tsx db/migrate.ts",
+    "db:import": "tsx scripts/import-ddinter.ts",
+    "db:names": "tsx scripts/build-name-dict.ts"
+  },
+  "dependencies": {
+    "grammy": "^1.48.0",
+    "next": "15.5.29",
+    "pg": "^8.23.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}
