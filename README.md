@@ -36,12 +36,31 @@ cp .env.example .env   # then fill in real values
 Before sending updates, register the webhook against your deployed URL with
 `secret_token` set to `TELEGRAM_WEBHOOK_SECRET`.
 
+## Bot commands
+
+| Command | Behavior |
+| --- | --- |
+| `/check <drug1> <drug2>` | Space or comma separated. Resolves each name (exact, then `pg_trgm` fuzzy, threshold 0.3) and renders the DDI row: severity badge (🔴 Major / 🟡 Moderate / 🟢 Minor / ⚪ Unknown), mechanism (when the source has it), and the resolved pair. |
+| `/lang en \| zh` | Sets the reply language for the chat (default zh; ja accepted, display follows P3). In-memory until a persistent store lands. |
+| `/help`, `/start` | Command list; welcome + usage. |
+
+Every reply carries the two mandatory lines — emergency numbers
+(120 / 911 / 119) and `⚠️ 非医疗建议 / Not medical advice` — from the shared
+`lib/render.ts` constants, so no code path can drift.
+
+**Not-found semantics (safety rule):** when `ddi_pairs` has no row, the reply
+renders `数据库未收录该组合，不代表无相互作用。` — never "no interaction" or
+"safe". Unresolvable drug names get a candidate list and a re-type/photo
+prompt (photo flow is P2).
+
 ## Development
 
 ```bash
 npm run dev           # local dev server on :3000
 npm run build         # production build
-npx tsc --noEmit      # type check
+npm run typecheck     # tsc --noEmit
+npm run test          # unit tests (node:test via tsx); DB-backed tests need NEON_DATABASE_URL
+npx tsx scripts/simulate-check.ts   # simulated /check acceptance run (real bot + real DB, stubbed Bot API)
 npm run db:migrate    # apply db/schema.sql (idempotent)
 npm run import:ddinter  # DDInter 2.0 bulk import (idempotent)
 npm run build:names     # name dictionary: EN (RxNorm) + ZH (PubChem) + per-language fallback
@@ -56,8 +75,15 @@ The scripts read `NEON_DATABASE_URL` from the environment, falling back to
 
 ```
 app/api/tg-webhook/route.ts   # webhook endpoint (grammY)
-lib/bot.ts                    # grammY Bot + command handlers
+lib/bot.ts                    # grammY Bot + /start, wires P1T7 handlers
+lib/render.ts                 # bilingual render + mandatory safety lines (single source of truth)
+lib/db.ts                     # process-level pg pool (Neon)
+lib/name-resolve.ts           # P1T5: exact + pg_trgm fuzzy name → ingredient_id
+lib/ddi-query.ts              # P1T6: bidirectional pair query + display names
 lib/env.ts                    # env access
+handlers/check.ts             # P1T7: /check + /lang command handlers
+tests/*.test.ts               # unit tests (node:test); DB-backed when DSN present
+scripts/simulate-check.ts     # simulated /check acceptance (real bot + real DB)
 db/schema.sql                 # canonical schema (drugs, ddi_pairs, drug_names)
 db/migrate.ts                 # applies schema.sql against NEON_DATABASE_URL
 scripts/import-ddinter.ts     # DDInter 2.0 bulk import (idempotent)

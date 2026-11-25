@@ -1,12 +1,22 @@
 import { Bot } from "grammy";
 import type { BotFullInfo } from "grammy/types";
+import { registerCheckHandlers } from "../handlers/check";
+import { EMERGENCY_LINE, DISCLAIMER_LINE } from "./render";
 import { loadEnv } from "./env";
 
+/**
+ * Reply text for /start. The safety footer is built from the same shared
+ * constants as every other reply path (render.ts), so safety rule 1
+ * (emergency line + ⚠️ 非医疗建议 / Not medical advice on EVERY reply) has
+ * one source of truth — /start cannot drift from /check.
+ */
 export const WELCOME_MESSAGE =
   "DDICBot — drug–drug interaction checker · 药物相互作用查询工具\n" +
-  "用法 Usage: /check <drug1> <drug2> (e.g. /check simvastatin aspirin)\n\n" +
-  "🚨 紧急请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）\n" +
-  "⚕️ 数据库检索仅供信息参考，非医疗建议。 / Database lookup only — not medical advice.";
+  "用法 Usage: /check <drug1> <drug2> (e.g. /check simvastatin aspirin)\n" +
+  "语言: /lang en 或 /lang zh（默认中文）· 帮助 Help: /help\n\n" +
+  EMERGENCY_LINE +
+  "\n" +
+  DISCLAIMER_LINE;
 
 /**
  * Placeholder botInfo used when `bot.init()` (getMe) cannot complete, e.g. in
@@ -51,5 +61,8 @@ export function createBot(botToken?: string, botInfo?: BotFullInfo): Bot {
     console.error("grammY bot.catch:", err.message);
   });
   bot.command("start", (ctx) => ctx.reply(WELCOME_MESSAGE));
+  // /check, /lang, /help (P1T7): bilingual DDI checker with mandatory
+  // safety footer on every reply.
+  registerCheckHandlers(bot);
   return bot;
 }
