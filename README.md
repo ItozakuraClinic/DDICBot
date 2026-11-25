@@ -42,7 +42,7 @@ npm run dev           # local dev server on :3000
 npm run build         # production build
 npx tsc --noEmit      # type check
 npm run db:migrate    # apply db/schema.sql (idempotent)
-npm run db:import     # DDInter 2.0 bulk import (idempotent)
+npm run import:ddinter  # DDInter 2.0 bulk import (idempotent)
 npm run db:names      # name dictionary: EN baseline + RxNorm synonyms
 npx tsx scripts/build-name-dict.ts --zh   # additionally fetch ZH labels (Wikidata)
 ```

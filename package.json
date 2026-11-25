@@ -9,7 +9,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "db:migrate": "tsx db/migrate.ts",
-    "db:import": "tsx scripts/import-ddinter.ts",
+    "import:ddinter": "tsx scripts/import-ddinter.ts",
     "db:names": "tsx scripts/build-name-dict.ts"
   },
   "dependencies": {
