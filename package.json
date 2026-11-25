@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "db:migrate": "tsx db/migrate.ts",
     "import:ddinter": "tsx scripts/import-ddinter.ts",
-    "db:names": "tsx scripts/build-name-dict.ts"
+    "db:names": "tsx scripts/build-name-dict.ts",
+    "build:names": "tsx scripts/build-name-dict.ts"
   },
   "dependencies": {
     "grammy": "^1.48.0",
