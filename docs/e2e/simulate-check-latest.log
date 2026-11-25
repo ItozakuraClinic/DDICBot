@@ -1,0 +1,113 @@
+(node:821359) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+=== acceptance: /check simvastatin aspirin (live data = ⚪ Unknown pair; badge + footer render) === [PASS]
+  --- reply ---
+  查询 Query: simvastatin → 辛伐他汀  ×  aspirin → 阿司匹林
+  
+  ⚪ Unknown / 未分类
+  来源未提供机制说明 (no mechanism text on record in DDInter bulk).
+  
+  ⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）
+  ⚠️ 非医疗建议 / Not medical advice
+
+=== Major badge path: /check warfarin aspirin (verified Major in the parent task) === [PASS]
+  --- reply ---
+  查询 Query: warfarin → 华法林  ×  aspirin → 阿司匹林
+  
+  🔴 Major / 严重
+  来源未提供机制说明 (no mechanism text on record in DDInter bulk).
+  
+  ⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）
+  ⚠️ 非医疗建议 / Not medical advice
+
+=== zh input: /check 阿司匹林,辛伐他汀 (comma separated, Chinese surface names) === [PASS]
+  --- reply ---
+  查询 Query: 阿司匹林 → 阿司匹林  ×  辛伐他汀 → 辛伐他汀
+  
+  ⚪ Unknown / 未分类
+  来源未提供机制说明 (no mechanism text on record in DDInter bulk).
+  
+  ⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）
+  ⚠️ 非医疗建议 / Not medical advice
+
+=== acceptance: /check zzzzqqqq aaaa → 未收录 (NOT 'no interaction') === [PASS]
+  --- reply ---
+  ❓ 无法识别以下药品名称：
+  • zzzzqqqq
+    没有近似候选。
+  • aaaa
+    没有近似候选。
+  
+  请重新输入药品名（用空格或逗号分隔两种），或发送药盒照片。
+  Usage: /check <drug1> <drug2>
+  
+  数据库未收录该组合，不代表无相互作用。
+  This combination is not in the database. An absent record is not evidence of interaction-free use.
+  
+  ⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）
+  ⚠️ 非医疗建议 / Not medical advice
+
+=== unresolvable single name: /check zzzzqqqq aspirin → re-prompt + 未收录 line === [PASS]
+  --- reply ---
+  ❓ 无法识别以下药品名称：
+  • zzzzqqqq
+    没有近似候选。
+  
+  请重新输入药品名（用空格或逗号分隔两种），或发送药盒照片。
+  Usage: /check <drug1> <drug2>
+  
+  数据库未收录该组合，不代表无相互作用。
+  This combination is not in the database. An absent record is not evidence of interaction-free use.
+  
+  ⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）
+  ⚠️ 非医疗建议 / Not medical advice
+
+=== usage: /check with one token → usage line + footer === [PASS]
+  --- reply ---
+  用法 Usage: /check <drug1> <drug2>
+  Example: /check simvastatin aspirin
+  (两种药品用空格或逗号分隔)
+  
+  ⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）
+  ⚠️ 非医疗建议 / Not medical advice
+
+=== /lang en switches reply language === [PASS]
+  --- reply ---
+  语言已切换 Language set to: en
+
+=== /check (en lang) simvastatin aspirin → English-first chrome, footer intact === [PASS]
+  --- reply ---
+  查询 Query: simvastatin → Simvastatin  ×  aspirin → Acetylsalicylic acid
+  
+  ⚪ Unknown / 未分类
+  No mechanism text on record in the DDInter bulk source.
+  
+  ⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）
+  ⚠️ 非医疗建议 / Not medical advice
+
+=== /help lists commands === [PASS]
+  --- reply ---
+  DDICBot commands
+  /check <drug1> <drug2> — 查询药物相互作用 (space or comma separated)
+  /lang en | zh — 设置回复语言 / set reply language
+  /help — 本帮助 / this help
+  /start — 欢迎信息 / welcome
+
+=== /start welcome carries usage + footer === [PASS]
+  --- reply ---
+  DDICBot — drug–drug interaction checker · 药物相互作用查询工具
+  用法 Usage: /check <drug1> <drug2> (e.g. /check simvastatin aspirin)
+  语言: /lang en 或 /lang zh（默认中文）· 帮助 Help: /help
+  
+  ⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）
+  ⚠️ 非医疗建议 / Not medical advice
+
+================= 10/10 cases pass =================

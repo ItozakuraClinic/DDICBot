@@ -1,0 +1,47 @@
+{
+  "run_at": "2026-11-25T19:22:40.315Z",
+  "production_url": "https://ddicbot.vercel.app/api/tg-webhook",
+  "target_chat_id_shape": {
+    "first3": "879",
+    "last3": "497",
+    "len": 9
+  },
+  "cases": [
+    {
+      "case": "card literal pair: /check simvastatin aspirin (live data ⚪ Unknown + both mandatory lines)",
+      "input": "/check simvastatin aspirin",
+      "webhook_http": 200,
+      "webhook_response": "{\"ok\":true}"
+    },
+    {
+      "case": "Major demo pair: /check warfarin aspirin (verified 🔴 Major)",
+      "input": "/check warfarin aspirin",
+      "webhook_http": 200,
+      "webhook_response": "{\"ok\":true}"
+    },
+    {
+      "case": "not-in-DB: /check zzzzqqqq aaaa (must say 未收录)",
+      "input": "/check zzzzqqqq aaaa",
+      "webhook_http": 200,
+      "webhook_response": "{\"ok\":true}"
+    },
+    {
+      "case": "welcome: /start",
+      "input": "/start",
+      "webhook_http": 200,
+      "webhook_response": "{\"ok\":true}"
+    }
+  ],
+  "probe_no_token": {
+    "http": 405,
+    "response": "{\"ok\":false,\"error\":\"unauthorized\"}"
+  },
+  "probe_bad_token": {
+    "http": 405,
+    "response": "{\"ok\":false,\"error\":\"unauthorized\"}"
+  },
+  "getWebhookInfo_after": {
+    "http": 200,
+    "result": "{\n \"ok\": true,\n \"result\": {\n  \"url\": \"https://ddicbot.vercel.app/api/tg-webhook\",\n  \"has_custom_certificate\": false,\n  \"pending_update_count\": 0,\n  \"max_connections\": 40,\n  \"ip_address\": \"64.29.17.131\",\n  \"allowed_updates\": [\n   \"message\",\n   \"callback_query\"\n  ]\n }\n}"
+  }
+}

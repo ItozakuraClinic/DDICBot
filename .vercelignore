@@ -1,0 +1,11 @@
+# Local-only data (drug release files, caches, secrets) — never to the cloud
+data/
+# build outputs and deps
+.next/
+node_modules/
+# local env
+.env
+.env.local
+*.tsbuildinfo
+# docs/scratch that are not part of the runtime
+docs/

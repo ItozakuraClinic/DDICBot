@@ -29,3 +29,6 @@ data/
 
 # vercel
 .vercel/
+
+# ops copy of the production webhook secret (Vercel secret is the source of truth)
+data/webhook-secret-prod.txt
