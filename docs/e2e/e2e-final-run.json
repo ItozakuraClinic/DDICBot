@@ -1,5 +1,5 @@
 {
-  "run_at": "2026-11-26T13:03:28.444Z",
+  "run_at": "2026-11-26T14:15:54.450Z",
   "target": "https://ddicbot.vercel.app/api/tg-webhook",
   "deploy_agnostic": true,
   "preshot_note": "The P3 deploy is applied by the parent task after this run. Against the pre-P3 build the same script records baseline behavior (chat_langs row absent; /lang en works in-memory); re-run post-deploy to record the P3-verified state. The script hard-fails only on transport/registration breaks.",
@@ -30,7 +30,7 @@
     {
       "name": "[zh] /lang reached the bot and (post-P3-deploy) persisted chat_langs row",
       "pass": true,
-      "note": "no row — PRESHOT behavior (pre-P3 code keeps lang in-memory only)"
+      "note": "row matches (P3 live)"
     },
     {
       "name": "[zh] reply text (DM) must show Unknown/未收录 semantics + both mandatory lines — human-verified; machine side-channels above are green",
@@ -50,7 +50,7 @@
     {
       "name": "[en] /lang reached the bot and (post-P3-deploy) persisted chat_langs row",
       "pass": true,
-      "note": "no row — PRESHOT behavior (pre-P3 code keeps lang in-memory only)"
+      "note": "row matches (P3 live)"
     },
     {
       "name": "[en] reply text (DM) must show Unknown/未收录 semantics + both mandatory lines — human-verified; machine side-channels above are green",
