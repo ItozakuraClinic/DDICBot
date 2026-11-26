@@ -1,0 +1,42 @@
+bot=ddicheckerbot(6155908269) | chat 879..497 | prod=https://ddicbot.vercel.app/api/tg-webhook
+webhook before: url=https://ddicbot.vercel.app/api/tg-webhook pending=0 last_err=none
+
+================ CASE A: photo1 → tap1 → photo2 → tap2 → DDI (Major expected)
+A1 user photo1 sent id=158 (real file_id AgACAgUAAxkD…)
+A2 crafted photo1 update -> webhook HTTP 200 {"ok":true}
+  PASS | A2 photo update processed by production (photo_sessions row created)
+    (keyboard rendered into the DM — human-verified there; machine check: session row)
+A3 crafted tap1 -> webhook HTTP 200 {"ok":true}
+  PASS | A3 tap1 confirmed by live callback handler (1 ingredient persisted to photo_sessions)
+A4 user photo2 sent id=164 (real file_id AgACAgUAAxkD…)
+A5 crafted photo2 update -> webhook HTTP 200
+  PASS | A5 photo2 re-ran without losing the first confirmation (session refreshed, 1 still confirmed)
+A6 crafted tap2 -> webhook HTTP 200
+  PASS | A6 2nd tap fired the DDI (session consumed by clearPending) — result in DM
+    (DDI result text is in the DM between the brackets — Major badge expected: simva+clarithromycin)
+    webhook after A: pending=0 last_err=none
+
+================ CASE B: non-drug photo → 未识别到药品 + ddic:none clears
+B1 user photo sent id=169
+  PASS | B non-drug photo processed with ZERO DB candidates (empty session → no keyboard; 未识别到药品 text in DM)
+  PASS | B2 none-tap on zero-candidate session clears it (no drug persisted)
+
+================ CASE C: candidate keyboard → 'None of these' tap → cancel
+C1 user photo sent id=174
+  PASS | C none-tap on candidate keyboard cancels (session [], then cleared) — /check re-prompt in DM
+
+================ PII static assertion (no image bytes persisted)
+files=16 fsImports=0 writeCalls=0
+  PASS | PII: zero node:fs imports & zero image/fs-write calls in lib/app/handlers
+  PASS | PII: no bytea / photo / image column in any public table
+
+================ 9/9 machine-verified cases PASS ================
+  PASS | A2 photo update processed by production (photo_sessions row created)
+  PASS | A3 tap1 confirmed by live callback handler (1 ingredient persisted to photo_sessions)
+  PASS | A5 photo2 re-ran without losing the first confirmation (session refreshed, 1 still confirmed)
+  PASS | A6 2nd tap fired the DDI (session consumed by clearPending) — result in DM
+  PASS | B non-drug photo processed with ZERO DB candidates (empty session → no keyboard; 未识别到药品 text in DM)
+  PASS | B2 none-tap on zero-candidate session clears it (no drug persisted)
+  PASS | C none-tap on candidate keyboard cancels (session [], then cleared) — /check re-prompt in DM
+  PASS | PII: zero node:fs imports & zero image/fs-write calls in lib/app/handlers
+  PASS | PII: no bytea / photo / image column in any public table
