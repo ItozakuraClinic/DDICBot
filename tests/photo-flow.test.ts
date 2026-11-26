@@ -227,7 +227,7 @@ test("NEVER-AUTO-MATCH: photo update with zero taps fires ZERO ddi calls", async
     map: async () => [
       { ingredient_id: "DDInter1675", db_name: "sinvastatin (statin)", llm_name: "Simvastatin", how: "fuzzy", confidence: 0.99 },
     ],
-    lang: () => "zh",
+    lang: async () => "zh",
   };
   const { sent } = stubOutbound();
   // Bare Bot (NOT createBot): createBot auto-registers the LIVE photo
@@ -267,7 +267,7 @@ test("photo flow e2e (stubs): tap 1 → 1/2 prompt; tap 2 → DDI result; then s
     map: async () => [
       { ingredient_id: "ID_A", db_name: "simvastatin", llm_name: "Simvastatin", how: "exact", confidence: 0.99 },
     ],
-    lang: () => "zh",
+    lang: async () => "zh",
   };
   const secondPhoto: PhotoDeps = {
     ...firstPhoto,
@@ -333,7 +333,7 @@ test("NONE tap cancels the session and prompts /check re-entry", async (t) => {
     map: async () => [
       { ingredient_id: "ID_C", db_name: "ibuprofen", llm_name: "Ibuprofen", how: "exact", confidence: 0.9 },
     ],
-    lang: () => "zh",
+    lang: async () => "zh",
   };
   registerPhotoHandlers(bot, { photo: photoDeps, ddi: ddiDeps });
   await bot.handleUpdate(makePhotoUpdate("F3", 701));
@@ -357,7 +357,7 @@ test("stale keyboard tap (no live session) is refused — no phantom confirm", a
     fetch: async () => ({ bytes: new Uint8Array([1]), mime: "image/jpeg" }),
     vision: async () => [],
     map: async () => [],
-    lang: () => "zh",
+    lang: async () => "zh",
   };
   registerPhotoHandlers(bot, { photo: photoDeps, ddi: ddiDeps });
   await bot.handleUpdate(makeCallbackUpdate("ddic:pick:ID_Z", 801, 10));
@@ -376,7 +376,7 @@ test("handlePhotoCore: empty vision output → '未识别到药品 / No drug ide
     fetch: async () => ({ bytes: new Uint8Array(), mime: "image/jpeg" }),
     vision: async () => [],
     map: async () => [],
-    lang: () => "zh",
+    lang: async () => "zh",
   });
   assert.equal(out.candidates.length, 0);
   assert.ok(out.text.includes("未识别到药品"), out.text);

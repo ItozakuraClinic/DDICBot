@@ -62,7 +62,7 @@ if (!failed) {
   const client2 = new pg.Client({ connectionString: url });
   try {
     await client2.connect();
-    for (const t of ["drugs", "ddi_pairs", "drug_names"]) {
+    for (const t of ["drugs", "ddi_pairs", "drug_names", "chat_langs"]) {
       const r = await client2.query(`select count(*)::int as n from ${t}`);
       console.log(`${t} count: ${(r.rows[0] as { n: number }).n}`);
     }

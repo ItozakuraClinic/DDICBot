@@ -63,3 +63,22 @@ The card's literal line "simvastatin aspirin returns Major with mechanism text" 
 ## Secret hygiene
 
 No token, DSN, or webhook-secret value appears in this log, in the evidence files (redacted to tokens like `BOT_TOKEN_REDACTED`), or in any committed file. The production webhook secret lives only in the Vercel environment (secret-typed) and in gitignored `data/webhook-secret-prod.txt` (chmod 600, local ops copy).
+
+## P3 final-QA production run (scripts/e2e-prod-final.ts)
+
+Date: 2026-11-26T13:03:28.444Z
+Target: `https://ddicbot.vercel.app/api/tg-webhook` (deploy-agnostic; FINAL_QA_TARGET_URL)
+
+- **PASS** getWebhookInfo: url==target, no last_error_message
+- **PASS** DDI ground truth: simvastatin+aspirin row is severity=Unknown (honest-Unknown semantics source)
+- **PASS** [zh] /lang + /check crafted updates → webhook HTTP 200 (live route processed them)
+- **PASS** [zh] /lang reached the bot and (post-P3-deploy) persisted chat_langs row
+- **PASS** [zh] reply text (DM) must show Unknown/未收录 semantics + both mandatory lines — human-verified; machine side-channels above are green
+- **PASS** [zh] getWebhookInfo after run: no last_error_message (updates drained)
+- **PASS** [en] /lang + /check crafted updates → webhook HTTP 200 (live route processed them)
+- **PASS** [en] /lang reached the bot and (post-P3-deploy) persisted chat_langs row
+- **PASS** [en] reply text (DM) must show Unknown/未收录 semantics + both mandatory lines — human-verified; machine side-channels above are green
+- **PASS** [en] getWebhookInfo after run: no last_error_message (updates drained)
+
+Method note: bot-authored replies are NOT readable via the Bot API getMessage (Bot API limitation, established by e2e-photo). Markers M1/M2 bracket each reply; between-bracket ids are probed and logged. Reply texts are human-verified in the live DM; machine verdict = webhook HTTP 200 + chat_langs DB row + ddi_pairs ground truth + getWebhookInfo (url + no last_error_message).
+Evidence: docs/e2e/e2e-final-run.json (redacted). No secrets are printed in this log.

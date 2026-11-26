@@ -83,6 +83,16 @@ CREATE TABLE IF NOT EXISTS photo_sessions (
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- ---------------------------------------------------------------------------
+-- Per-chat UI language (P3): /lang en|zh|ja is persisted here so the choice
+-- survives across stateless webhook instances and bot restarts (same reason
+-- photo_sessions exists). Chat id + a 2-char code only — no PII.
+CREATE TABLE IF NOT EXISTS chat_langs (
+  chat_id    BIGINT PRIMARY KEY,
+  lang       TEXT NOT NULL CHECK (lang IN ('en', 'zh', 'ja')),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Pair lookup is the hot path (bidirectional: query checks both directions).
 CREATE INDEX IF NOT EXISTS idx_ddi_pairs_ab
   ON ddi_pairs (drug_a_ingredient, drug_b_ingredient);

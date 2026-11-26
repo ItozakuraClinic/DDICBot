@@ -14,7 +14,7 @@ import { loadEnv } from "./env";
 export const WELCOME_MESSAGE =
   "DDICBot — drug–drug interaction checker · 药物相互作用查询工具\n" +
   "用法 Usage: /check <drug1> <drug2> (e.g. /check simvastatin aspirin)\n" +
-  "语言: /lang en 或 /lang zh（默认中文）· 帮助 Help: /help\n\n" +
+  "语言: /lang en 或 /lang zh 或 /lang ja（默认中文）· 帮助 Help: /help\n\n" +
   EMERGENCY_LINE +
   "\n" +
   DISCLAIMER_LINE;

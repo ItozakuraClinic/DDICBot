@@ -1,0 +1,719 @@
+{
+  "run_at": "2026-11-26T13:59:51.534Z",
+  "target": "local next start (127.0.0.1, free port) — prod-shaped stack",
+  "method": "HTTP lane: crafted updates POSTed to the built route with local secret-token; /lang proven via chat_langs DB read-back. Reply lane: simulate-check.ts in-process stub of outbound sendMessage; live Neon resolution+DDI. Matrix severities re-verified against ddi_pairs at startup.",
+  "totals": {
+    "cases": 117,
+    "pass": 117,
+    "fail": 0
+  },
+  "checks_by_lane": {
+    "http": 54,
+    "reply": 61,
+    "gate": 2
+  },
+  "results": [
+    {
+      "lane": "gate",
+      "name": "npm run build green",
+      "pass": true,
+      "detail": "                  0 B         113 kB\n├ ƒ /api/cron/refresh                0 B            0 B\n└ ƒ /api/tg-webhook                  0 B            0 B\n+ First Load JS shared by all     113 kB\n  ├ chunks/3a4c999da81d8f52.js   75.5 kB\n  ├ chunks/9f8427060b631bed.js   24.7 kB\n  └ other shared chunks (total)  13.4 kB\n\n\n○  (Static)   prerendered as static content\nƒ  (Dynamic)  server-rendered on demand\n\n"
+    },
+    {
+      "lane": "gate",
+      "name": "next start: GET /api/tg-webhook 200 within 60s",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "http",
+      "name": "GET health probe → 200 {status:'ok'}",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "POST without secret token → 405",
+      "pass": true,
+      "detail": "status=405"
+    },
+    {
+      "lane": "http",
+      "name": "POST with wrong secret token → 405",
+      "pass": true,
+      "detail": "status=405"
+    },
+    {
+      "lane": "http",
+      "name": "/start → HTTP 200 through prod route",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "/help → HTTP 200 through prod route",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "/lang zh POSTed + chat_langs row reads back 'zh'",
+      "pass": true,
+      "detail": "status=200 stored=zh"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check aspirin acalabrutinib (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check warfarin aspirin (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check 5-hydroxytryptophan tramadol (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check fentanyl fluoxetine (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check aspirin abciximab (Moderate) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check 5-hydroxytryptophan codeine (Moderate) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check alcohol fentanyl (Moderate) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check aspirin caffeine (Minor) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check aspirin acitretin (Unknown) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check simvastatin aspirin (Unknown) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check metformin caffeine (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check metformin sitagliptin (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check metformin colchicine (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check omeprazole caffeine (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[zh] /check omeprazole sitagliptin (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "/lang en POSTed + chat_langs row reads back 'en'",
+      "pass": true,
+      "detail": "status=200 stored=en"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check aspirin acalabrutinib (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check warfarin aspirin (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check 5-hydroxytryptophan tramadol (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check fentanyl fluoxetine (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check aspirin abciximab (Moderate) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check 5-hydroxytryptophan codeine (Moderate) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check alcohol fentanyl (Moderate) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check aspirin caffeine (Minor) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check aspirin acitretin (Unknown) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check simvastatin aspirin (Unknown) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check metformin caffeine (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check metformin sitagliptin (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check metformin colchicine (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check omeprazole caffeine (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[en] /check omeprazole sitagliptin (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "/lang ja POSTed + chat_langs row reads back 'ja'",
+      "pass": true,
+      "detail": "status=200 stored=ja"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check aspirin acalabrutinib (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check warfarin aspirin (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check 5-hydroxytryptophan tramadol (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check fentanyl fluoxetine (Major) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check aspirin abciximab (Moderate) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check 5-hydroxytryptophan codeine (Moderate) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check alcohol fentanyl (Moderate) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check aspirin caffeine (Minor) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check aspirin acitretin (Unknown) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check simvastatin aspirin (Unknown) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check metformin caffeine (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check metformin sitagliptin (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check metformin colchicine (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check omeprazole caffeine (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "[ja] /check omeprazole sitagliptin (notfound) → HTTP 200",
+      "pass": true,
+      "detail": "status=200"
+    },
+    {
+      "lane": "http",
+      "name": "/lang (no arg) POSTed → HTTP 200, stored lang still 'ja'",
+      "pass": true,
+      "detail": "status=200 stored=ja"
+    },
+    {
+      "lane": "reply",
+      "name": "/lang no-arg on fresh chat reports 'Current: zh' + footer",
+      "pass": true,
+      "detail": "当前语言 Current: zh\n用法 Usage: /lang en | /lang zh | /lang ja\n\n⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）\n⚠️ 非医疗建议 / Not m"
+    },
+    {
+      "lane": "reply",
+      "name": "/lang klingon rejected with usage hint",
+      "pass": true,
+      "detail": "无效语言 Invalid value. Use: /lang en | /lang zh | /lang ja\n\n⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）\n⚠️ 非医疗建议 / Not med"
+    },
+    {
+      "lane": "reply",
+      "name": "/start: usage + /lang en|zh|ja + command list + both mandatory lines",
+      "pass": true,
+      "detail": "DDICBot — drug–drug interaction checker · 药物相互作用查询工具\n用法 Usage: /check <drug1> <drug2> (e.g. /check simvastatin aspirin)\n语言: /lang en 或 /lang zh 或 /lang ja（默认中文）"
+    },
+    {
+      "lane": "reply",
+      "name": "/help: lists /check /lang /start + both mandatory lines",
+      "pass": true,
+      "detail": "DDICBot commands\n/check <drug1> <drug2> — 查询药物相互作用 (space or comma separated)\n/lang en | zh | ja — 设置回复语言 / set reply language\n/help — 本帮助 / this help\n/start — "
+    },
+    {
+      "lane": "reply",
+      "name": "/lang zh confirms + footer",
+      "pass": true,
+      "detail": "语言已切换 Language set to: zh\n\n⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）\n⚠️ 非医疗建议 / Not medical advic"
+    },
+    {
+      "lane": "reply",
+      "name": "/lang (no arg) after /lang zh reports Current: zh",
+      "pass": true,
+      "detail": "当前语言 Current: zh\n用法 Usage: /lang en | /lang zh | /lang ja\n\n⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）\n⚠️ 非医疗建议 / Not m"
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check aspirin acalabrutinib → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check warfarin aspirin → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check 5-hydroxytryptophan tramadol → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check fentanyl fluoxetine → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check aspirin abciximab → Moderate badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check 5-hydroxytryptophan codeine → Moderate badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check alcohol fentanyl → Moderate badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check aspirin caffeine → Minor badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check aspirin acitretin → Unknown badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check simvastatin aspirin → Unknown badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check metformin caffeine → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check metformin sitagliptin → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check metformin colchicine → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check omeprazole caffeine → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[zh] /check omeprazole sitagliptin → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "/lang en confirms + footer",
+      "pass": true,
+      "detail": "语言已切换 Language set to: en\n\n⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）\n⚠️ 非医疗建议 / Not medical advic"
+    },
+    {
+      "lane": "reply",
+      "name": "/lang (no arg) after /lang en reports Current: en",
+      "pass": true,
+      "detail": "当前语言 Current: en\n用法 Usage: /lang en | /lang zh | /lang ja\n\n⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）\n⚠️ 非医疗建议 / Not m"
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check aspirin acalabrutinib → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check warfarin aspirin → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check 5-hydroxytryptophan tramadol → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check fentanyl fluoxetine → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check aspirin abciximab → Moderate badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check 5-hydroxytryptophan codeine → Moderate badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check alcohol fentanyl → Moderate badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check aspirin caffeine → Minor badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check aspirin acitretin → Unknown badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check simvastatin aspirin → Unknown badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check metformin caffeine → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check metformin sitagliptin → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check metformin colchicine → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check omeprazole caffeine → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[en] /check omeprazole sitagliptin → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "/lang ja confirms + footer",
+      "pass": true,
+      "detail": "语言已切换 Language set to: ja\n\n⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）\n⚠️ 非医疗建议 / Not medical advic"
+    },
+    {
+      "lane": "reply",
+      "name": "/lang (no arg) after /lang ja reports Current: ja",
+      "pass": true,
+      "detail": "当前语言 Current: ja\n用法 Usage: /lang en | /lang zh | /lang ja\n\n⚕️ 急症请立即拨打当地急救电话（中国大陆 120 / 美国 911 / 日本 119）\n⚠️ 非医疗建议 / Not m"
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check aspirin acalabrutinib → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check warfarin aspirin → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check 5-hydroxytryptophan tramadol → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check fentanyl fluoxetine → Major badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check aspirin abciximab → Moderate badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check 5-hydroxytryptophan codeine → Moderate badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check alcohol fentanyl → Moderate badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check aspirin caffeine → Minor badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check aspirin acitretin → Unknown badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check simvastatin aspirin → Unknown badge + mechanism shape + footer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check metformin caffeine → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check metformin sitagliptin → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check metformin colchicine → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check omeprazole caffeine → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "[ja] /check omeprazole sitagliptin → EXACT notfound lines (no 'no interaction')",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "switch: /lang zh → pair renders zh chrome (🔴 Major / 严重) + no-mechanism zh placeholder",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "switch: /lang ja → same pair now renders ja chrome (🔴 重大)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "switch: /lang en → same pair renders en chrome (🔴 Major / 严重)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "switch: ja notfound line EXACT in a post-switch reply",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "ja unresolvable /check: re-prompt + all notfound lines + both mandatory lines",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "lane": "reply",
+      "name": "usage path /check aspirin: usage line + both mandatory lines",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

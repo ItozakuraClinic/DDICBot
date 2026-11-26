@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "purpose": "DDICBot P3 final-QA pair matrix. Severities and mechanism-translation coverage VERIFIED against the live Neon ddi_pairs table on 2026-11-26 (ingredient ids resolved from drug_names lang='en'). Pairs are entered as [enNameA, enNameB]; 'expected' is the ddi_pairs.severity value, or 'notfound' when the pair has NO ddi_pairs row (both drugs still resolve to unique ingredients).",
+    "mechanism flags": "mechanismEn/Zh/Ja = whether ddi_pairs.mechanism_en/zh/ja is non-null for the pair (verified 2026-11-26). The expected rendered mechanism line per display language follows lib/render.ts: zh → 机制: <zh> | 机制说明（英文）: <en> | source placeholder; en → Mechanism: <en> | en placeholder; ja → 仕組み: <ja> | Mechanism: <en> | en placeholder.",
+    "severity_mix": {
+      "Major": ["aspirin + acalabrutinib", "warfarin + aspirin", "5-hydroxytryptophan + tramadol", "fentanyl + fluoxetine"],
+      "Moderate": ["aspirin + abciximab", "5-hydroxytryptophan + codeine", "alcohol + fentanyl"],
+      "Minor": ["aspirin + caffeine"],
+      "Unknown": ["aspirin + acitretin", "simvastatin + aspirin"]
+    },
+    "note": "simvastatin + aspirin = Unknown is the P1 live-DB truth carried into the final QA (same assertion as tests/ddi-query.test.ts and the P1 e2e data note): DDInter 2.0 labels that pair Unknown with all mechanism columns NULL; the bot renders the honest Unknown badge, never 'no interaction'. All pairs are single-token en surface names so /check tokenization resolves each side exactly."
+  },
+  "found": [
+    { "pair": ["aspirin", "acalabrutinib"], "expected": "Major", "ids": ["DDInter20", "DDInter9"], "mechanismEn": true, "mechanismZh": true, "mechanismJa": true },
+    { "pair": ["warfarin", "aspirin"], "expected": "Major", "ids": ["DDInter1951", "DDInter20"], "mechanismEn": false, "mechanismZh": false, "mechanismJa": false },
+    { "pair": ["5-hydroxytryptophan", "tramadol"], "expected": "Major", "ids": ["DDInter1362", "DDInter1841"], "mechanismEn": true, "mechanismZh": true, "mechanismJa": true },
+    { "pair": ["fentanyl", "fluoxetine"], "expected": "Major", "ids": ["DDInter722", "DDInter758"], "mechanismEn": true, "mechanismZh": true, "mechanismJa": true },
+    { "pair": ["aspirin", "abciximab"], "expected": "Moderate", "ids": ["DDInter20", "DDInter6"], "mechanismEn": true, "mechanismZh": true, "mechanismJa": true },
+    { "pair": ["5-hydroxytryptophan", "codeine"], "expected": "Moderate", "ids": ["DDInter1362", "DDInter429"], "mechanismEn": true, "mechanismZh": true, "mechanismJa": true },
+    { "pair": ["alcohol", "fentanyl"], "expected": "Moderate", "ids": ["DDInter690", "DDInter722"], "mechanismEn": true, "mechanismZh": true, "mechanismJa": true },
+    { "pair": ["aspirin", "caffeine"], "expected": "Minor", "ids": ["DDInter20", "DDInter263"], "mechanismEn": true, "mechanismZh": true, "mechanismJa": true },
+    { "pair": ["aspirin", "acitretin"], "expected": "Unknown", "ids": ["DDInter20", "DDInter21"], "mechanismEn": false, "mechanismZh": false, "mechanismJa": false },
+    { "pair": ["simvastatin", "aspirin"], "expected": "Unknown", "ids": ["DDInter1675", "DDInter20"], "mechanismEn": false, "mechanismZh": false, "mechanismJa": false }
+  ],
+  "notfound": [
+    { "pair": ["metformin", "caffeine"], "expected": "notfound", "ids": ["DDInter1164", "DDInter263"] },
+    { "pair": ["metformin", "sitagliptin"], "expected": "notfound", "ids": ["DDInter1164", "DDInter1679"] },
+    { "pair": ["metformin", "colchicine"], "expected": "notfound", "ids": ["DDInter1164", "DDInter431"] },
+    { "pair": ["omeprazole", "caffeine"], "expected": "notfound", "ids": ["DDInter1340", "DDInter263"] },
+    { "pair": ["omeprazole", "sitagliptin"], "expected": "notfound", "ids": ["DDInter1340", "DDInter1679"] }
+  ]
+}

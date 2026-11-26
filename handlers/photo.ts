@@ -22,7 +22,7 @@ import {
 import { clearPending, confirm, getPending, setPending } from "../lib/photo-state";
 import { queryDdi, fetchDisplayNames, type DdiResult } from "../lib/ddi-query";
 import { loadEnv } from "../lib/env";
-import { getChatLang } from "./check";
+import { getChatLang, type ChatLang } from "../lib/chat-lang";
 
 /**
  * Photo → vision candidates → inline-keyboard confirm → DDI (P2T2).
@@ -51,8 +51,9 @@ export interface PhotoDeps {
   vision: (bytes: Uint8Array, mime: string) => Promise<VisionCandidate[]>;
   /** LLM names → DB-validated candidates. */
   map: (raw: VisionCandidate[], hint: Lang) => Promise<MappedCandidate[]>;
-  /** Chat display-language resolver. */
-  lang: (chatId: number) => Lang;
+  /** Chat display-language resolver. P3: async — the stored language
+   *  (incl. ja) is a DB read from chat_langs (lib/chat-lang getChatLang). */
+  lang: (chatId: number) => Promise<ChatLang>;
 }
 
 /** Production deps: real Bot API download, real Kimi vision, real DB resolve. */
@@ -61,7 +62,7 @@ export const livePhotoDeps: PhotoDeps = {
     fetchPhotoBytes(loadEnv().botToken ?? "ddicbot:local-placeholder", fileId),
   vision: extractCandidates,
   map: mapVisionToDb,
-  lang: (chatId) => getChatLang(chatId),
+  lang: async (chatId) => await getChatLang(chatId),
 };
 
 export interface DdiDeps {
@@ -114,7 +115,8 @@ export async function handlePhotoCore(
 ): Promise<PhotoCoreOut> {
   await setPending(chatId); // (re)start the confirmation session for this chat
   const raw = await deps.vision(bytes, mime);
-  const mapped = await deps.map(raw, deps.lang(chatId));
+  const lang = await deps.lang(chatId);
+  const mapped = await deps.map(raw, lang);
   if (mapped.length === 0) {
     return {
       text:
@@ -125,16 +127,19 @@ export async function handlePhotoCore(
       candidates: [],
     };
   }
-  const lang = deps.lang(chatId);
   let lines =
     lang === "zh"
       ? "📷 照片识别完成。点选你正在使用的药品（最多两种；选满两种自动查询相互作用）：\n"
-      : "📷 Photo processed. Tap the drug(s) you are using (up to 2; once two are selected the interaction check runs):";
+      : lang === "ja"
+        ? "📷 写真を処理しました。使用している薬をタップしてください（2種類まで。2つ選択すると相互作用の自動照会が実行されます）:\n"
+        : "📷 Photo processed. Tap the drug(s) you are using (up to 2; once two are selected the interaction check runs):\n";
   for (const c of mapped) {
     lines += `• ${c.db_name} (${Math.round(c.confidence * 100)}%)\n`;
   }
   lines +=
-    "\n如都不是：点 “❌ None of these / 都不是”，或改用 /check <drug1> <drug2>\n\n" +
+    (lang === "ja"
+      ? "\nこれらでない場合：「❌ None of these / 都不是」をタップするか、/check <drug1> <drug2> で入力してください\n\n"
+      : "\n如都不是：点 “❌ None of these / 都不是”，或改用 /check <drug1> <drug2>\n\n") +
     footer;
   return { text: lines, candidates: mapped };
 }
@@ -153,7 +158,7 @@ export async function runPhotoDdi(
   b: { id: string; label: string },
   chatId: number,
   deps: DdiDeps,
-  lang: "en" | "zh",
+  lang: Lang, // P3: full display language — en | zh | ja (stored in chat_langs)
 ): Promise<string> {
   const ddi = await deps.ddi(a.id, b.id);
   const names = await deps.names([a.id, b.id]);
@@ -191,7 +196,14 @@ export function registerPhotoHandlers(bot: Bot, deps: PhotoHandlerDeps = default
       const sizes = ctx.message.photo;
       if (!sizes || sizes.length === 0) return;
       const largest = sizes[sizes.length - 1]; // largest size = best OCR surface
-      await ctx.reply("📷 已收到照片，正在识别中（几秒）... Photo received, processing...\n\n" + footer);
+      // Prompt is bilingual zh/en(+ja) — the task allows bilingual prompts;
+      // the DDI RESULT below is fully localized in the stored language.
+      const plang = await getChatLang(chatId).catch(() => "zh" as const);
+      const pmsg =
+        plang === "ja"
+          ? "📷 写真を受領しました。認識中に数秒かかります... Photo received, processing...\n\n" + footer
+          : "📷 已收到照片，正在识别中（几秒）... Photo received, processing...\n\n" + footer;
+      await ctx.reply(pmsg);
       try {
         const { bytes, mime } = await deps.photo.fetch(largest.file_id);
         const out = await handlePhotoCore(bytes, mime, chatId, deps.photo);
@@ -275,15 +287,16 @@ export function registerPhotoHandlers(bot: Bot, deps: PhotoHandlerDeps = default
       const [a, b] = res.confirmed;
       await ack("查询中 / querying...");
       try {
-        // getChatLang maps ja→en internally (see handlers/check.ts), so the
-        // returned value is structurally "en"|"zh". Map ConfirmedDrug → the
-        // {id, label} display shape runPhotoDdi renders from.
+        // P3: the stored chat language (en|zh|ja, chat_langs) drives the
+        // full display — ja renders Japanese chrome incl. the severity
+        // badge and the mechanism line.
+        const lang = await getChatLang(chatId);
         const text = await runPhotoDdi(
           { id: a.id, label: a.canonicalName },
           { id: b.id, label: b.canonicalName },
           chatId,
           deps.ddi,
-          getChatLang(chatId) as "en" | "zh",
+          lang,
         );
         await say(text);
       } catch (err) {
