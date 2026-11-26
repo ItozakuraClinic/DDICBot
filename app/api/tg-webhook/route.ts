@@ -8,6 +8,11 @@ export const runtime = "nodejs";
 // No caching: this endpoint receives mutable Telegram updates.
 export const dynamic = "force-dynamic";
 
+// P2 photo flow adds ~5–15s to a single request (getFile + Kimi vision +
+// DB resolve). 60s is the Hobby-plan ceiling and keeps one cold function
+// comfortably inside budget; text /check stays ~1s.
+export const maxDuration = 60;
+
 let initPromise: Promise<Bot> | undefined;
 
 /**

@@ -69,6 +69,7 @@ const set = await tg("setWebhook", {
   url: PROD_URL,
   drop_pending_updates: true,
   secret_token: WS,
+  // P2: photos ride on "message", inline-keyboard taps on "callback_query".
   allowed_updates: ["message", "callback_query"],
 });
 console.log("setWebhook http:", set.http, red(JSON.stringify(set.j)));

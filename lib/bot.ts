@@ -1,6 +1,7 @@
 import { Bot } from "grammy";
 import type { BotFullInfo } from "grammy/types";
 import { registerCheckHandlers } from "../handlers/check";
+import { registerPhotoHandlers } from "../handlers/photo";
 import { EMERGENCY_LINE, DISCLAIMER_LINE } from "./render";
 import { loadEnv } from "./env";
 
@@ -64,5 +65,10 @@ export function createBot(botToken?: string, botInfo?: BotFullInfo): Bot {
   // /check, /lang, /help (P1T7): bilingual DDI checker with mandatory
   // safety footer on every reply.
   registerCheckHandlers(bot);
+  // Photo flow (P2T2): onPhoto → vision candidates → DB-validated inline
+  // keyboard → explicit-tap confirmation → the single DDI call site.
+  // The onPhoto path carries NO ddi dependency (never-auto-match invariant);
+  // see handlers/photo.ts.
+  registerPhotoHandlers(bot);
   return bot;
 }

@@ -31,10 +31,20 @@ CREATE TABLE IF NOT EXISTS ddi_pairs (
   drug_b_ingredient   TEXT NOT NULL,
   severity            TEXT CHECK (severity IN ('Major', 'Moderate', 'Minor', 'Unknown')),
   mechanism_en        TEXT,
+  mechanism_zh        TEXT,
+  mechanism_ja        TEXT,
   source              TEXT NOT NULL DEFAULT 'DDInter 2.0',
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (drug_a_ingredient, drug_b_ingredient)
 );
+
+-- P3 (2026-11-26): LLM-translated mechanism text, one per pair. Translations
+-- are produced by scripts/translate-mechanisms.ts (local tooling; the LLM is
+-- a translation layer only — it never touches severity or pair membership).
+-- CREATE TABLE IF NOT EXISTS above does not add columns to an existing
+-- table, so the idempotent ALTERs are the migration of record for them.
+ALTER TABLE ddi_pairs ADD COLUMN IF NOT EXISTS mechanism_zh TEXT;
+ALTER TABLE ddi_pairs ADD COLUMN IF NOT EXISTS mechanism_ja TEXT;
 
 CREATE TABLE IF NOT EXISTS drug_names (
   id            SERIAL PRIMARY KEY,
@@ -56,6 +66,22 @@ CREATE INDEX IF NOT EXISTS idx_drugs_canonical_trgm
   ON drugs USING gin (canonical_en gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS idx_drug_names_ingredient
   ON drug_names (ingredient_id);
+
+-- ---------------------------------------------------------------------------
+-- Photo confirmation sessions (P2): the "two drugs selected, awaiting DDI"
+-- state between the vision reply and the second user tap.
+--
+-- WHY A TABLE: Vercel serves webhook POSTs from stateless function
+-- instances — a photo update and its follow-up tap can land on DIFFERENT
+-- instances, so the pending confirmation MUST live in the DB to survive.
+-- Chat ids and ingredient_ids only. SAFETY RULE 4: no image bytes, no
+-- base64, no file paths — the PII hygiene test asserts no image-ish column
+-- in this schema; keep it that way.
+CREATE TABLE IF NOT EXISTS photo_sessions (
+  chat_id      BIGINT PRIMARY KEY,
+  confirmed    TEXT NOT NULL,              -- JSON: [{id, canonicalName}] in tap order (0..1 entries)
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
 -- Pair lookup is the hot path (bidirectional: query checks both directions).
 CREATE INDEX IF NOT EXISTS idx_ddi_pairs_ab
