@@ -57,6 +57,20 @@ import { fileURLToPath } from "node:url";
 import { Client } from "pg";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
+// P3 re-run: photo paths + tapped pair are env-configurable so the harness
+// runs against whatever real fixtures are on hand (the P2 run used
+// clarithromycin boxes captured at the time; the P3 re-run stages the
+// committed data/test-photo-e2e/ fixtures — simvastatin + aspirin, whose
+// live severity is the honest Unknown, recorded in the notes).
+const PHOTO1 = process.env.P3E2E_PHOTO1 ?? "/tmp/p3e2e_simva.jpg";
+const PHOTO2 = process.env.P3E2E_PHOTO2 ?? "/tmp/p3e2e_aspirin.jpg";
+const PHOTOND = process.env.P3E2E_PHOTOND ?? "/tmp/p3e2e_nondrug.jpg";
+const DRUG1 = process.env.P3E2E_DRUG1 ?? "simvastatin";
+const DRUG2 = process.env.P3E2E_DRUG2 ?? "aspirin";
+// P3 re-run: chat language set via crafted /lang before the flow (zh|en|ja).
+const START_LANG = process.env.P3E2E_LANG ?? "zh";
+// P3 re-run: artifact filename tag keeps the P2 record untouched.
+const RTag = "v1.0.0-" + START_LANG;
 
 function parseEnv(p: string): Record<string, string> {
   const out: Record<string, string> = {};
@@ -219,11 +233,48 @@ async function main(): Promise<void> {
   await c0.query("DELETE FROM photo_sessions WHERE chat_id = $1", [CHAT]);
   await c0.end();
 
+  // P3: set the chat language through the PERSISTED path (chat_langs).
+  // Root cause of the first v1.0.0-zh run's L0 FAIL (reproduced on prod):
+  // the bot_command entity length must cover the COMMAND NAME ONLY
+  // ("/lang" = 5). grammY extracts the command as text[1..e.length] and
+  // matches it against the registered set — with length covering the
+  // argument too ("/lang zh" = 8) it extracts "lang zh", an unregistered
+  // command, so the /lang handler silently never fires: the webhook still
+  // answers 200 and no chat_langs row is written (zero errors in the
+  // function logs — no handler ran at all). e2e-prod-final emits length
+  // = m[0].length of /^\/[a-zA-Z0-9_]+/ (name only) and passed 10/10 on
+  // that shape; this run does the same. update_id/message_id also stay
+  // fresh per run so no crafted update collides with a recently-delivered
+  // one.
+  const hLang = await postHook({
+    update_id: Date.now(),
+    message: {
+      message_id: Date.now() + 1,
+      date: Math.floor(Date.now() / 1000),
+      from: { id: USER_ID, is_bot: false, first_name: "E2E", username: "e2e_probe" },
+      chat: { id: CHAT, type: "private", first_name: "E2E", username: "e2e_probe" },
+      text: `/lang ${START_LANG}`,
+      entities: [{ type: "bot_command", offset: 0, length: "/lang".length }],
+    },
+  });
+  await sleep(1500);
+  const cLang = await db();
+  const langRow = await cLang.query("SELECT lang FROM chat_langs WHERE chat_id = $1", [CHAT]);
+  await cLang.end();
+  say(`L0 /lang ${START_LANG} -> webhook HTTP ${hLang.status}, chat_langs=${langRow.rows[0]?.lang ?? "(no row)"}`);
+  passLine({
+    name: `L0 /lang ${START_LANG} persisted in chat_langs before photo flow`,
+    pass: hLang.status === 200 && langRow.rows[0]?.lang === START_LANG,
+    note: `http=${hLang.status} stored=${langRow.rows[0]?.lang ?? null}`,
+  });
+
   // ================================================================= CASE A
-  // Two-photo confirmation → DDI. Production pair: simvastatin + clarithromycin = Major.
-  say("\n================ CASE A: photo1 → tap1 → photo2 → tap2 → DDI (Major expected)");
+  // Two-photo confirmation → DDI. Tapped pair comes from env (P3 re-run:
+  // simvastatin + aspirin = honest Unknown per live ddi_pairs; the P2 run
+  // used simvastatin + clarithromycin = Major).
+  say(`\n================ CASE A: photo1 (lang ${START_LANG}) → tap1 → photo2 → tap2 → DDI (${DRUG1}+${DRUG2})`);
   try {
-    const p1 = await sendPhoto("/tmp/p2e2e_simva.jpg");
+    const p1 = await sendPhoto(PHOTO1);
     say(`A1 user photo1 sent id=${p1.id} (real file_id ${p1.fileId.slice(0, 12)}…)`);
     const m1 = await marker();
     const h1 = await postHook(photoUpdate(11, p1.fileId));
@@ -239,7 +290,7 @@ async function main(): Promise<void> {
 
     const m2 = await marker();
     const h2 = await postHook(
-      tapUpdate(12, 90916, "ddic:pick:" + (await realId("simvastatin")), "Simvastatin (99%)"),
+      tapUpdate(12, 90916, "ddic:pick:" + (await realId(DRUG1)), DRUG1[0].toUpperCase() + DRUG1.slice(1) + " (99%)"),
     );
     say(`A3 crafted tap1 -> webhook HTTP ${h2.status} ${JSON.stringify(h2.body)}`);
     const sConfirm1 = await waitSession(
@@ -253,7 +304,7 @@ async function main(): Promise<void> {
       note: `http=${h2.status} confirmed=${JSON.stringify(conf1)}`,
     });
 
-    const p2 = await sendPhoto("/tmp/p2e2e_clara.jpg");
+    const p2 = await sendPhoto(PHOTO2);
     say(`A4 user photo2 sent id=${p2.id} (real file_id ${p2.fileId.slice(0, 12)}…)`);
     const m3 = await marker();
     // setPending on photo2 refreshes the session and PRESERVES the one
@@ -272,7 +323,7 @@ async function main(): Promise<void> {
     });
 
     const h4 = await postHook(
-      tapUpdate(14, 90918, "ddic:pick:" + (await realId("clarithromycin")), "Clarithromycin (97%)"),
+      tapUpdate(14, 90918, "ddic:pick:" + (await realId(DRUG2)), DRUG2[0].toUpperCase() + DRUG2.slice(1) + " (97%)"),
     );
     say(`A6 crafted tap2 -> webhook HTTP ${h4.status}`);
     // runPhotoDdi consumes the session → row gone. Wait for the row to CLEAR.
@@ -282,7 +333,7 @@ async function main(): Promise<void> {
       pass: h4.status === 200 && sGone === null,
       note: `http=${h4.status} session_after=${JSON.stringify(sGone)}`,
     });
-    say(`    (DDI result text is in the DM between the brackets — Major badge expected: simva+clarithromycin)`);
+    say(`    (DDI result text is in the DM between the brackets — expected severity per live ddi_pairs for ${DRUG1}+${DRUG2})`);
     const gwA = await tg("getWebhookInfo", null);
     say(`    webhook after A: pending=${gwA.result?.pending_update_count} last_err=${gwA.result?.last_error_message ?? "none"}`);
   } catch (err) {
@@ -293,7 +344,7 @@ async function main(): Promise<void> {
   // ================================================================= CASE B
   say("\n================ CASE B: non-drug photo → 未识别到药品 + ddic:none clears");
   try {
-    const pb = await sendPhoto("/tmp/p2e2e_nondrug.jpg");
+    const pb = await sendPhoto(PHOTOND);
     say(`B1 user photo sent id=${pb.id}`);
     const mb = await marker();
     const hb = await postHook(photoUpdate(15, pb.fileId));
@@ -322,7 +373,7 @@ async function main(): Promise<void> {
   // ================================================================= CASE C
   say("\n================ CASE C: candidate keyboard → 'None of these' tap → cancel");
   try {
-    const pc = await sendPhoto("/tmp/p2e2e_simva.jpg");
+    const pc = await sendPhoto(PHOTO1);
     say(`C1 user photo sent id=${pc.id}`);
     const mc = await marker();
     const hc = await postHook(photoUpdate(17, pc.fileId));
@@ -401,14 +452,14 @@ async function main(): Promise<void> {
 
   const fsmod = await import("node:fs");
   fsmod.mkdirSync(`${root}docs/e2e`, { recursive: true });
-  fsmod.writeFileSync(`${root}docs/e2e/photo-e2e-run.log.txt`, log.join("\n") + "\n");
+  fsmod.writeFileSync(`${root}docs/e2e/photo-e2e-run-${RTag}.log.txt`, log.join("\n") + "\n");
   fsmod.writeFileSync(
-    `${root}docs/e2e/photo-e2e-summary.json`,
+    `${root}docs/e2e/photo-e2e-summary-${RTag}.json`,
     JSON.stringify({ run_at: new Date().toISOString(), prod: HOOK, method: "crafted updates with real file_ids; DB + webhook machine-verification; DM texts human-verified", results }, null, 2),
   );
   if (failed > 0) process.exitCode = 1;
 
-  for (const f of ["/tmp/p2e2e_simva.jpg", "/tmp/p2e2e_clara.jpg", "/tmp/p2e2e_nondrug.jpg"]) {
+  for (const f of [PHOTO1, PHOTO2, PHOTOND]) {
     try { if (existsSync(f)) unlinkSync(f); } catch { /* ignore */ }
   }
 }

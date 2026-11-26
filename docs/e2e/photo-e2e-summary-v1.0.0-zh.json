@@ -1,0 +1,57 @@
+{
+  "run_at": "2026-11-26T15:28:48.870Z",
+  "prod": "https://ddicbot.vercel.app/api/tg-webhook",
+  "method": "crafted updates with real file_ids; DB + webhook machine-verification; DM texts human-verified",
+  "results": [
+    {
+      "name": "L0 /lang zh persisted in chat_langs before photo flow",
+      "pass": true,
+      "note": "http=200 stored=zh"
+    },
+    {
+      "name": "A2 photo update processed by production (photo_sessions row created)",
+      "pass": true,
+      "note": "http=200 session={\"chat_id\":\"879268497\",\"confirmed\":\"[]\",\"updated_at\":\"2026-11-26T15:27:12.818Z\"}"
+    },
+    {
+      "name": "A3 tap1 confirmed by live callback handler (1 ingredient persisted to photo_sessions)",
+      "pass": true,
+      "note": "http=200 confirmed=[{\"id\":\"DDInter1675\",\"canonicalName\":\"辛伐他汀\"}]"
+    },
+    {
+      "name": "A5 photo2 re-ran without losing the first confirmation (session refreshed, 1 still confirmed)",
+      "pass": true,
+      "note": "confirmed=[{\"id\":\"DDInter1675\",\"canonicalName\":\"辛伐他汀\"}]"
+    },
+    {
+      "name": "A6 2nd tap fired the DDI (session consumed by clearPending) — result in DM",
+      "pass": true,
+      "note": "http=200 session_after=null"
+    },
+    {
+      "name": "B non-drug photo processed with ZERO DB candidates (empty session → no keyboard; 未识别到药品 text in DM)",
+      "pass": true,
+      "note": "http=200 session={\"chat_id\":\"879268497\",\"confirmed\":\"[]\",\"updated_at\":\"2026-11-26T15:28:01.926Z\"}"
+    },
+    {
+      "name": "B2 none-tap on zero-candidate session clears it (no drug persisted)",
+      "pass": true,
+      "note": "http=200 session_after=null"
+    },
+    {
+      "name": "C none-tap on candidate keyboard cancels (session [], then cleared) — /check re-prompt in DM",
+      "pass": true,
+      "note": "photo_http=200 none_http=200 session_after=null"
+    },
+    {
+      "name": "PII: zero node:fs imports & zero image/fs-write calls in lib/app/handlers",
+      "pass": true,
+      "note": ""
+    },
+    {
+      "name": "PII: no bytea / photo / image column in any public table",
+      "pass": true,
+      "note": "none"
+    }
+  ]
+}
