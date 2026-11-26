@@ -102,6 +102,58 @@ test("found result with mechanism text renders it (en lang)", () => {
   assert.ok(String(r.text).includes(DISCLAIMER_LINE));
 });
 
+// ── P3T2 translated-mechanism display paths ──────────────────────────────
+
+test("P3T2 zh: mechanism_zh present → renders 机制: <zh> (not the EN fallback note)", () => {
+  const ddi: DdiResult = {
+    found: true,
+    severity: "Major",
+    mechanism_en: "Both drugs are proarrhythmic and can prolong the QT interval.",
+    mechanism_zh: "这两种药物都有致心律失常作用，可能延长QT间期。",
+    mechanism_ja: "両薬剤とも不整脈を誘発し、QT間期を延長させる可能性がある。",
+    pair_count: 1,
+  };
+  const r = renderCheck(
+    { raw: "a", resolution: exactResolution("X1") },
+    { raw: "b", resolution: exactResolution("X2") },
+    ddi,
+    "zh",
+    {},
+  );
+  const text = String(r.text);
+  assert.ok(text.includes("🔴 Major"));
+  assert.ok(text.includes("机制: 这两种药物都有致心律失常作用，可能延长QT间期。"));
+  // When zh is on record it must NOT fall back to the English-labelled line.
+  assert.ok(!text.includes("机制说明（英文）"), "zh must win over the EN fallback note");
+  assert.ok(text.includes(EMERGENCY_LINE));
+  assert.ok(text.includes(DISCLAIMER_LINE));
+});
+
+test("P3T2 zh: mechanism_zh absent, mechanism_en present → 机制说明（英文）: <en>", () => {
+  const ddi: DdiResult = {
+    found: true,
+    severity: "Moderate",
+    mechanism_en: "Coagulation tests should be monitored closely (example text).",
+    mechanism_zh: null,
+    mechanism_ja: null,
+    pair_count: 1,
+  };
+  const r = renderCheck(
+    { raw: "a", resolution: exactResolution("X1") },
+    { raw: "b", resolution: exactResolution("X2") },
+    ddi,
+    "zh",
+    {},
+  );
+  const text = String(r.text);
+  assert.ok(text.includes("🟡 Moderate"));
+  assert.ok(text.includes("机制说明（英文）: Coagulation tests should be monitored closely (example text)."));
+  // The plain placeholder line must not appear when EN text is in fact on record.
+  assert.ok(!text.includes("no mechanism text on record"), "must not claim no mechanism on record");
+  assert.ok(text.includes(EMERGENCY_LINE));
+  assert.ok(text.includes(DISCLAIMER_LINE));
+});
+
 // ── DB-backed tests (Neon branch database) ───────────────────────────────
 
 (async () => {

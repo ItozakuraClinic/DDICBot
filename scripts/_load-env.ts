@@ -13,6 +13,7 @@ const WANTED = [
   "DDICBOT_BOT_TOKEN",
   "TELEGRAM_WEBHOOK_SECRET",
   "VERCEL_ACCESS_TOKEN",
+  "DEEPSEEK_API_KEY",
 ];
 
 export function loadHermesEnv(): Record<string, string> {

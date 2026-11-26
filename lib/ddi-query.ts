@@ -25,15 +25,19 @@ export interface DdiResult {
   found: boolean;
   /** Undefined when not found. "Unknown" is a real DDInter severity value. */
   severity?: Severity;
-  /** English source mechanism text; NULL across the bulk until the Phase-3
-   *  UI-crawl decision lands (Ruling 1), so expect null. */
+  /** English source mechanism text; NULL for pairs outside the Phase-3
+   *  UI-crawl coverage (8,463 of 236,834 pairs have it after the backfill). */
   mechanism_en?: string | null;
+  /** LLM-translated mechanism (P3T2); null until scripts/translate-mechanisms.ts
+   *  has covered the pair. Translation layer only — never alters the EN text. */
+  mechanism_zh?: string | null;
+  mechanism_ja?: string | null;
   /** How many ddi_pairs rows matched (1 in practice; unique pair invariant). */
   pair_count: number;
 }
 
 const PAIR_SQL = `
-  SELECT severity, mechanism_en,
+  SELECT severity, mechanism_en, mechanism_zh, mechanism_ja,
          COUNT(*) OVER () AS pair_count
   FROM ddi_pairs
   WHERE (drug_a_ingredient = $1 AND drug_b_ingredient = $2)
@@ -56,6 +60,8 @@ export async function queryDdi(
     const row = rows.rows[0] as {
       severity: string;
       mechanism_en: string | null;
+      mechanism_zh: string | null;
+      mechanism_ja: string | null;
       pair_count: string | number;
     };
     const severity = row.severity as Severity;
@@ -63,6 +69,8 @@ export async function queryDdi(
       found: true,
       severity,
       mechanism_en: row.mechanism_en,
+      mechanism_zh: row.mechanism_zh,
+      mechanism_ja: row.mechanism_ja,
       pair_count: Number(row.pair_count),
     };
   } finally {

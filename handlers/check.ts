@@ -84,12 +84,12 @@ export async function handleCheckCore(
   ];
 
   if (!resA.ingredient_id || !resB.ingredient_id) {
-    return renderCheck(slots[0], slots[1], { found: false, pair_count: 0 }, lang as "zh" | "en", {});
+    return renderCheck(slots[0], slots[1], { found: false, pair_count: 0 }, lang as "zh" | "en", {}, lang);
   }
 
   const ddi = await deps.ddi(resA.ingredient_id, resB.ingredient_id);
   const names = await deps.names([resA.ingredient_id, resB.ingredient_id]);
-  return renderCheck(slots[0], slots[1], ddi, lang as "zh" | "en", names);
+  return renderCheck(slots[0], slots[1], ddi, lang as "zh" | "en", names, lang);
 }
 
 /**

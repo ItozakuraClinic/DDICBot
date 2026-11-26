@@ -3,7 +3,16 @@
     {
       "source": "/api/tg-webhook",
       "destination": "/api/tg-webhook"
+    },
+    {
+      "source": "/api/cron/refresh",
+      "destination": "/api/cron/refresh"
     }
   ],
-  "crons": []
+  "crons": [
+    {
+      "path": "/api/cron/refresh",
+      "schedule": "0 6 * * *"
+    }
+  ]
 }

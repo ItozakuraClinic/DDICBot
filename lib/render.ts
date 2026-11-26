@@ -81,6 +81,13 @@ export function renderCheck(
   ddi: DdiResult,
   lang: UiLang,
   names: Record<string, DisplayNames>,
+  /** P3T2: language of the user's query. When it is "ja" (or the display
+   *  language has a stored translation for that language) the mechanism line
+   *  uses mechanism_ja instead of English, per the card's "if
+   *  mechanism_zh/mechanism_ja exists, show the translated version". The rest
+   *  of the chrome (badges, not-found, footer) stays on the P2 zh/en design —
+   *  a full ja UI is P3T4's scope and is NOT invented here. */
+  mechLang: Lang = lang,
 ): CheckRender {
   if (!a.resolution.ingredient_id || !b.resolution.ingredient_id) {
     const bad = [a, b].filter((s) => !s.resolution.ingredient_id);
@@ -131,24 +138,39 @@ export function renderCheck(
 
   const sev = ddi.severity as Severity;
   head.push(`\n${SEVERITY_BADGE[sev]}`);
-  if (ddi.mechanism_en) {
+  const hasZh = Boolean(ddi.mechanism_zh && ddi.mechanism_zh.trim());
+  const hasJa = Boolean(ddi.mechanism_ja && ddi.mechanism_ja.trim());
+  const hasEn = Boolean(ddi.mechanism_en && ddi.mechanism_en.trim());
+  if (lang === "zh") {
+    if (hasZh) {
+      // P3T2: show the translated version when it is on record.
+      head.push(`机制: ${ddi.mechanism_zh}`);
+    } else if (hasEn) {
+      // Translation not yet covered this pair — show the English source and
+      // label it plainly. Never drop the mechanism, never imply absence.
+      head.push(`机制说明（英文）: ${ddi.mechanism_en}`);
+    } else {
+      head.push("来源未提供机制说明 (no mechanism text on record in DDInter bulk).");
+    }
+  } else if (mechLang === "ja" && hasJa) {
+    // A Japanese-language query asks for the mechanism in Japanese when it is
+    // on record. Display chrome stays English (P2) — only the mechanism line
+    // is localized, per the P3T2 contract.
+    head.push(`Mechanism (JA): ${ddi.mechanism_ja}`);
+  } else if (hasEn) {
     head.push(`Mechanism: ${ddi.mechanism_en}`);
   } else {
-    // Ruling 1: mechanism_en stays NULL on the bulk until the Phase-3
-    // UI-crawl decision. Say it is not on record — never invent text.
-    head.push(
-      lang === "zh"
-        ? "来源未提供机制说明 (no mechanism text on record in DDInter bulk)."
-        : "No mechanism text on record in the DDInter bulk source.",
-    );
+    head.push("No mechanism text on record in the DDInter bulk source.");
   }
   head.push("", footer(lang));
   return { text: head.join("\n"), severity: sev, found: true, bothResolved: true };
 }
 
 /**
- * Pure text classifier for the /lang command input (en|zh|ja accepted;
- * ja maps to en display until P3 adds Japanese UI strings).
+ * Pure text classifier for the /lang command input (en|zh|ja accepted).
+ * Display: zh renders Chinese chrome, en English chrome, ja English chrome
+ * with a Japanese mechanism line when the translation is on record (P3T2);
+ * a full ja UI is P3T4's scope.
  */
 export function parseLangInput(raw: string): Lang | undefined {
   const t = raw.trim().toLowerCase();
